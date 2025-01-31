@@ -1,17 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a proof-of-concept [Next.js](https://nextjs.org) for [Better Auth](https://www.better-auth.com/), using vanilla Javascript.
 
 ## Getting Started
 
-First, run the development server:
+First install dependencies:
+
+```bash
+npm install
+```
+
+Run the database migration for database:
+
+```bash
+npx @better-auth/cli migrate
+```
+
+Create environment variable file in the root directory `.env.local`:
+
+```
+BETTER_AUTH_SECRET=thequickbrownfox
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+Run the development server for Next.js:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -20,17 +33,10 @@ You can start editing the page by modifying `app/page.js`. The page auto-updates
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Dependency Docs
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Better Auth](https://www.better-auth.com/docs/introduction) -- Typescript-safe Authentication library
+- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) -- minimal database provider for Better Auth
+- [Tailwind CSS](https://tailwindcss.com/docs/installation/framework-guides/nextjs) -- Tailwind CSS utility library
+- [Prettier](https://prettier.io/docs/) -- Code Formatter
+- [prettier-plugin-tailwindcss](https://github.com/tailwindlabs/prettier-plugin-tailwindcss) -- Tailwind CSS class sorter

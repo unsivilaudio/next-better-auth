@@ -4,7 +4,8 @@ import { useState, useActionState } from 'react';
 import { authClient } from '@/lib/auth-client';
 
 export default function AuthPage() {
-  const { data: session, error: authError } = authClient.useSession();
+  const { data: session } = authClient.useSession();
+  const [authError, setAuthError] = useState(null);
   const [isLogin, setIsLogin] = useState(true);
 
   function toggleAuthMode() {
@@ -12,35 +13,37 @@ export default function AuthPage() {
   }
 
   async function onAuthSubmit(_prevState, fd) {
+    setAuthError(null);
     const email = fd.get('email');
     const password = fd.get('password');
-    if (isLogin) {
-      const { data } = await authClient.signIn.email({
+    const mode = isLogin ? 'signIn' : 'signUp';
+    try {
+      const { error } = await authClient[mode].email({
         email,
         password,
       });
-      console.log(data);
-      return;
+      if (error) {
+        throw new Error(error.message);
+      }
+    } catch (error) {
+      setAuthError(
+        error.message || 'Could not complete request, try again later.',
+      );
+      return { email, password };
     }
-
-    const { data } = await authClient.signUp.email({
-      email,
-      password,
-      name: email,
-    });
-    console.log(data);
   }
 
   async function onLogout() {
     await authClient.signOut();
   }
 
-  const [, action, isPending] = useActionState(onAuthSubmit, null);
+  const [state, action, isPending] = useActionState(onAuthSubmit, null);
+  console.log(state, session);
 
   return (
-    <main className='min-h-screen w-full bg-stone-900 px-10 pb-10 pt-12 text-stone-100'>
+    <main className='min-h-screen w-full bg-stone-900 px-10 pt-12 pb-10 text-stone-100'>
       {authError && (
-        <p className='w-full rounded-md bg-red-300 p-6 text-center'>
+        <p className='mx-auto mb-8 w-full max-w-[60rem] rounded-md bg-red-400 px-6 py-4 text-center text-2xl'>
           {authError}
         </p>
       )}
@@ -59,10 +62,11 @@ export default function AuthPage() {
               Email
             </label>
             <input
-              className='input'
+              className='form-input'
               type='email'
               name='email'
               placeholder='your@email.com'
+              defaultValue={state?.email}
               required
             />
           </div>
@@ -71,17 +75,18 @@ export default function AuthPage() {
               Password
             </label>
             <input
-              className='input'
+              className='form-input'
               type='password'
               name='password'
               placeholder='Enter a strong passsord...'
+              defaultValue={state?.password}
               required
             />
           </div>
-          <div className='mt-4 flex items-center justify-end'>
+          <div className='mt-6 flex items-center justify-end'>
             <button
               disabled={isPending}
-              className='rounded-md bg-blue-500 px-7 py-2 text-lg font-bold uppercase drop-shadow-md duration-300 hover:bg-blue-600 hover:drop-shadow-sm disabled:bg-stone-300 disabled:text-stone-500'
+              className='cursor-pointer rounded-md bg-blue-500 px-7 py-2 text-lg font-bold uppercase drop-shadow-md duration-300 hover:bg-blue-600 hover:drop-shadow-sm disabled:bg-stone-300 disabled:text-stone-500'
             >
               {!isPending && (!isLogin ? 'Sign Up' : 'Login')}
               {isPending && 'Submitting...'}
@@ -103,12 +108,14 @@ export default function AuthPage() {
       </form>
       <section className='mt-12 space-y-6 text-center'>
         <h1 className='text-3xl'>
-          {session ? 'You are signed in!' : 'You are NOT signed in.'}
+          {session
+            ? `You are signed in as ${session.user.email}!`
+            : 'You are NOT signed in.'}
         </h1>
         {session && (
           <button
             onClick={onLogout}
-            className='rounded-md border-2 border-stone-300 p-4 px-6 py-2 font-bold text-stone-300'
+            className='cursor-pointer rounded-md border-2 border-stone-300 p-4 px-6 py-2 font-bold text-stone-300'
           >
             Logout
           </button>
